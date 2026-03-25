@@ -1,0 +1,46 @@
+version: "3.7"
+services:
+  nextcloud:
+    container_name: nextcloud
+    image: nextcloud:30
+    restart: unless-stopped
+    depends_on:
+      - nextcloud-db
+    environment:
+      - TZ=${TZ}
+      - POSTGRES_HOST=nextcloud-db
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+      - NEXTCLOUD_DATA_DIR=/var/www/html/data
+      - REDIS_HOST=shared_valkey
+    volumes:
+      - ${NEXTCLOUD_APP_LOCATION}:/var/www/html
+      - ${NEXTCLOUD_DATA_LOCATION}:/var/www/html/data
+    networks:
+      - frontend
+      - nextcloud-net
+      - valkey-net
+
+  nextcloud-db:
+    container_name: nextcloud_db
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
+    networks:
+      - nextcloud-net
+
+networks:
+  frontend:
+    external: true
+  nextcloud-net:
+    name: nextcloud-net
+  valkey-net:
+    external: true
