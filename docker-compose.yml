@@ -24,6 +24,7 @@ services:
       - SMTP_PASSWORD=${SMTP_PASS}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
       - MAIL_DOMAIN=${MAIL_DOMAIN}
+      - NEXTCLOUD_TRUSTED_DOMAINS=cloud.jeya.dev
     volumes:
       - ${NEXTCLOUD_APP_LOCATION}:/var/www/html
       - ${NEXTCLOUD_DATA_LOCATION}:/var/www/html/data
