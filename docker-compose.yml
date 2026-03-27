@@ -2,7 +2,7 @@ version: "3.7"
 services:
   nextcloud:
     container_name: nextcloud
-    image: nextcloud:30
+    image: nextcloud:32
     restart: unless-stopped
     depends_on:
       - nextcloud-db
@@ -32,6 +32,8 @@ services:
       - frontend
       - nextcloud-net
       - valkey-net
+    extra_hosts:
+      - "cloud.jeya.dev:172.19.0.15"
 
   nextcloud-db:
     container_name: nextcloud_db
@@ -45,6 +47,22 @@ services:
       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
     networks:
       - nextcloud-net
+
+  nextcloud-cron:
+    image: nextcloud:32
+    restart: unless-stopped
+    container_name: nextcloud_cron
+    volumes:
+      - ${NEXTCLOUD_APP_LOCATION}:/var/www/html
+      - ${NEXTCLOUD_DATA_LOCATION}:/var/www/html/data
+    user: www-data
+    entrypoint: /bin/sh -c 'while true; do php -f /var/www/html/cron.php; sleep 300; done'
+    depends_on:
+      - nextcloud
+      - nextcloud-db
+    networks:
+      - nextcloud-net
+      - valkey-net
 
 networks:
   frontend:
