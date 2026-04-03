@@ -25,6 +25,11 @@ services:
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
       - MAIL_DOMAIN=${MAIL_DOMAIN}
       - NEXTCLOUD_TRUSTED_DOMAINS=cloud.jeya.dev
+    cap_add:
+      - SYS_ADMIN
+      - MKNOD
+    security_opt:
+      - apparmor:unconfined
     volumes:
       - ${NEXTCLOUD_APP_LOCATION}:/var/www/html
       - ${NEXTCLOUD_DATA_LOCATION}:/var/www/html/data
@@ -32,8 +37,7 @@ services:
       - frontend
       - nextcloud-net
       - valkey-net
-    extra_hosts:
-      - "cloud.jeya.dev:172.19.0.15"
+
 
   nextcloud-db:
     container_name: nextcloud_db
